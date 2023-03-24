@@ -1,0 +1,53 @@
+url: ""
+functions:
+- type: knative-workflow
+  id: vmware-python
+  image: gcr.io/direktiv/functions/vmware-python:test
+states:
+- id: state0
+  type: action
+  action:
+    function: vmware-python
+    input:
+      commands:
+      - command: python3 -c 'print("Hello World")'
+  transition: state1
+- id: state1
+  type: action
+  action:
+    function: vmware-python
+    input:
+      commands:
+      - command: python3 -c 'import os;print(os.environ["hello"])'
+        envs:
+        - name: hello
+          value: world
+  transition: state2
+- id: state2
+  type: action
+  action:
+    function: vmware-python
+    input:
+      commands:
+      - command: pyenv local 3.8.13
+      - command: python3 -V
+  transition: state3
+- id: state3
+  type: action
+  action:
+    function: vmware-python
+    input:
+      commands:
+      - command: pyenv local 3.8.13
+      - command: python3 vcenter-connect.py
+      files:
+      - data: "import requests\nimport urllib3\nfrom vmware.vapi.vsphere.client import
+          create_vsphere_client\nsession = requests.session()\n\n# Disable cert verification
+          for demo purpose. \n# This is not recommended in a production environment.\nsession.verify
+          = False\n\n# Disable the secure connection warning for demo purpose.\n#
+          This is not recommended in a production environment.\nurllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)\n\n#
+          Connect to a vCenter Server using username and password\nvsphere_client
+          = create_vsphere_client(server='<vc_ip>', username='<vc_username>', password='<vc_password>',
+          session=session)\n\n# List all VMs inside the vCenter Server\nvsphere_client.vcenter.VM.list()
+          \              \n"
+        name: vcenter-connect.py
