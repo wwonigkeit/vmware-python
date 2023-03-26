@@ -11,57 +11,52 @@ RUN cd src && \
     export CGO_LDFLAGS="-static -w -s" && \
     go build -tags osusergo,netgo -o /application cmd/vmware-python-server/main.go; 
 
-FROM ubuntu:20.04
+FROM debian:bullseye
 
 ENV DEBIAN_FRONTEND=noninteractive 
 
 RUN apt-get update && apt-get install -y \
-		curl \
-		locales 
+		ca-certificates \
+		libbluetooth-dev \
+		netbase \
+		tk-dev \
+		uuid-dev
 
-RUN locale-gen en_US.UTF-8 
-ENV LANG=en_US.UTF-8 \
-	LANGUAGE=en_US:en \
-	LC_ALL=en_US.UTF-8
+ENV LANG C.UTF-8
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-		ca-certificates \
+		curl \
 		cmake \
 		gnupg \
 		gzip \
 		jq \
-		libcurl4-openssl-dev \
-		libssl-dev \
-		make \
-		net-tools \
-		netcat \
-		openssh-client \
-		software-properties-common \
-		tar \
 		tzdata \
 		unzip \
 		wget \
 		zip \
-        build-essential \
-		ca-certificates \
+		dpkg-dev \
+		gcc \
+		gnupg dirmngr \
+		libbluetooth-dev \
 		libbz2-dev \
+		libc6-dev \
+		libdb-dev \
+		libexpat1-dev \
+		libffi-dev \
+		libgdbm-dev \
 		liblzma-dev \
-		libncurses5-dev \
 		libncursesw5-dev \
 		libreadline-dev \
-		libffi-dev \
 		libsqlite3-dev \
-		libxml2-dev \
-		libxmlsec1-dev \
-		llvm \
+		libssl-dev \
 		make \
-		python-openssl \
 		tk-dev \
+		uuid-dev \
 		wget \
 		xz-utils \
 		zlib1g-dev
 
-RUN add-apt-repository ppa:git-core/ppa && apt-get install -y git
+RUN apt-get install -y git
 
 RUN curl https://pyenv.run | bash 
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -70,9 +65,10 @@ ENV PYENV_ROOT=/root/.pyenv \
 	PATH=/root/.pyenv/shims:/root/.pyenv/bin:/root/.poetry/bin:$PATH
 
 # install n-2 (pyenv install --list)
-RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install 3.10.5 && pyenv global 3.10.5
-RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install 3.9.13
-RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install 3.8.13
+RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install 3.11.2 && pyenv global 3.11.2
+# RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install 3.10.10 && pyenv global 3.10.10
+# RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install 3.9.16
+# RUN env PYTHON_CONFIGURE_OPTS="--enable-shared --enable-optimizations" pyenv install 3.8.16
 
 RUN python --version && \
 	pip --version && \
